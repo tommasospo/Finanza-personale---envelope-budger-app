@@ -13,12 +13,12 @@
   }
   *{box-sizing:border-box}
   body{margin:0;font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt)}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,#121821,#0f1419);border-bottom:1px solid var(--line);padding:14px 18px;display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,#121821,#0f1419);border-bottom:1px solid var(--line);padding:14px 18px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
   header h1{font-size:16px;margin:0;font-weight:650;letter-spacing:.2px}
   .grow{flex:1}
   .wrap{max-width:1080px;margin:0 auto;padding:18px}
   .grid{display:grid;gap:16px}
-  @media(min-width:900px){.cols{grid-template-columns:1.55fr 1fr}}
+  @media(min-width:900px){.cols{grid-template-columns:1.45fr 1fr}}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
   .card h2{margin:0 0 12px;font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--mut);font-weight:600}
   .row{display:flex;align-items:center;gap:10px}
@@ -55,7 +55,6 @@
   .caret.open{transform:rotate(90deg)}
   .kids{padding:6px 12px 12px 44px;border-top:1px dashed var(--line);background:#1b2330}
   .kid{display:grid;grid-template-columns:1.4fr 90px 130px 90px 30px;gap:8px;align-items:center;padding:5px 0}
-  @media(max-width:640px){.kid{grid-template-columns:1fr 70px 90px 60px 26px}}
   .kid .mEq{font-size:12px;color:var(--good);text-align:right}
   .tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .calcOut{background:#11202e;border:1px solid #244257;border-radius:10px;padding:14px;margin-top:12px}
@@ -66,14 +65,12 @@
   .nav{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
   .nav button[data-tab]{background:var(--chip);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 12px;font:inherit;cursor:pointer}
   .nav button[data-tab].active{background:var(--accent);color:#06223f;border-color:var(--accent);font-weight:600}
-  .navspace{flex:1 1 auto}
   .burger{display:none;background:transparent;border:0;color:var(--txt);font-size:22px;line-height:1;padding:2px 8px;cursor:pointer}
   @media(max-width:760px){
     .burger{display:block}
     .nav{display:none;flex-direction:column;align-items:stretch;gap:5px}
     .nav.open{display:flex}
     .nav button{width:100%;text-align:left}
-    .navspace{display:none}
     .kids{padding-left:14px}
     .kids .row{flex-direction:column;align-items:stretch}
     .kids label.f{flex-direction:column !important;align-items:stretch !important;gap:4px}
@@ -89,6 +86,7 @@
   .note{font-size:12px;color:var(--mut);background:#161d26;border:1px solid var(--line);border-left:3px solid var(--accent);padding:8px 10px;border-radius:6px;margin-top:8px}
   .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#06223f;border:1px solid var(--accent);color:#dbeeff;padding:10px 16px;border-radius:10px;opacity:0;transition:.25s;pointer-events:none}
   .toast.show{opacity:1}
+  h3.sec{font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);margin:18px 0 8px}
 </style>
 </head>
 <body>
@@ -101,134 +99,142 @@
 
 <div class="wrap grid">
   <nav id="nav" class="nav">
-    <button data-tab="dash" class="active" onclick="tab('dash')">Allocazione</button>
-    <button data-tab="calc" onclick="tab('calc')">Calcolatore</button>
-    <button data-tab="acc" onclick="tab('acc')">Conti & patrimonio</button>
+    <button data-tab="distrib" class="active" onclick="tab('distrib')">Distribuzione</button>
+    <button data-tab="monthly" onclick="tab('monthly')">Mensile</button>
+    <button data-tab="admin" onclick="tab('admin')">Admin</button>
     <button data-tab="hist" onclick="tab('hist')">Storico</button>
-    <button data-tab="sync" onclick="tab('sync')">Sync ☁</button>
-    <button data-tab="info" onclick="tab('info')">Come funziona</button>
-    <span class="navspace"></span>
-    <button class="ghost sm" onclick="exportJSON()">⬇ Export</button>
-    <button class="ghost sm" onclick="document.getElementById('imp').click()">⬆ Import</button>
-    <input id="imp" type="file" accept="application/json" class="hide" onchange="importJSON(this)">
-    <button class="ghost sm danger" onclick="resetAll()">Reset</button>
+    <button data-tab="info" onclick="tab('info')">Info</button>
   </nav>
 
-  <!-- DASHBOARD -->
-  <section id="t-dash" class="grid cols">
+  <!-- ============ DISTRIBUZIONE (read-only) ============ -->
+  <section id="t-distrib" class="grid cols">
     <div class="grid">
       <div class="card">
-        <h2>Allocazione mensile</h2>
-        <label class="f" style="flex-direction:row;align-items:center;gap:8px;margin-bottom:12px;color:var(--txt)">Stipendio del mese
-          <input id="salary" type="number" step="1" style="width:140px"></label>
+        <h2>Riepilogo del mese</h2>
         <div class="kpi" id="kpi"></div>
         <div class="note" id="reconc"></div>
       </div>
       <div class="card">
-        <div class="row between" style="margin-bottom:10px">
-          <h2 style="margin:0">Envelope</h2>
-          <button class="sm" onclick="addEnvelope()">+ Nuovo conto</button>
-        </div>
-        <div id="envs"></div>
+        <h2>Bonifici da fare</h2>
+        <p class="small mut" style="margin:0 0 8px">Quanto spostare su ciascun conto questo mese.</p>
+        <div id="bonifici"></div>
       </div>
     </div>
-    <div class="grid">
-      <div class="card">
-        <h2>Versamenti del mese</h2>
-        <p class="small mut" style="margin:0 0 8px">Quanto effettivamente versare in ognuno (oltre il target va in "overbudget").</p>
-        <table id="deposits"></table>
+    <div class="card">
+      <h2>Versamenti per envelope</h2>
+      <p class="small mut" style="margin:0 0 8px">Oltre il target il surplus va in "overbudget".</p>
+      <table id="deposits"></table>
+    </div>
+  </section>
+
+  <!-- ============ MENSILE (input del mese) ============ -->
+  <section id="t-monthly" class="hide grid">
+    <div class="card">
+      <h2>Aggiornamento del mese</h2>
+      <label class="f" style="flex-direction:row;align-items:center;gap:8px;color:var(--txt)">Stipendio del mese
+        <input id="salary" type="number" step="1" style="width:140px"></label>
+    </div>
+    <div class="card">
+      <h2>Saldi dei conti</h2>
+      <p class="small mut" style="margin:0 0 8px">Quanto c'è ora su ciascun conto.</p>
+      <table id="accBalances"></table>
+    </div>
+    <div class="card">
+      <h2>Residuo nelle envelope</h2>
+      <p class="small mut" style="margin:0 0 8px">Quanto è rimasto in ciascun fondo.</p>
+      <table id="envBalances"></table>
+    </div>
+    <div class="card">
+      <div class="row between">
+        <div><b>Chiudi il mese</b><div class="small mut">Salva la fotografia nel database per lo storico.</div></div>
+        <button class="primary" onclick="archiveMonth()">📌 Archivia situazione</button>
       </div>
     </div>
   </section>
 
-  <!-- CALC -->
-  <section id="t-calc" class="hide">
-    <div class="card" style="max-width:560px">
+  <!-- ============ ADMIN (costanti) ============ -->
+  <section id="t-admin" class="hide grid">
+    <div class="card">
+      <h2>Sincronizzazione (Google Sheet)</h2>
+      <label class="f">URL Web App (finisce con <code>/exec</code>)
+        <input id="sheetUrl" placeholder="https://script.google.com/macros/s/.../exec"></label>
+      <div class="tools" style="margin-top:12px">
+        <button class="primary sm" onclick="connectSheet()">Connetti &amp; carica dal Sheet</button>
+        <button class="sm" onclick="pullRemote(true)">⬇ Carica dal Sheet</button>
+        <button class="sm" onclick="pushRemote(true)">⬆ Salva sul Sheet ora</button>
+        <button class="sm ghost danger" onclick="disconnectSheet()">Disconnetti</button>
+      </div>
+      <div class="note" id="syncMsg">Non connesso. L'app salva solo nel browser.</div>
+    </div>
+
+    <div class="card">
+      <div class="row between" style="margin-bottom:10px"><h2 style="margin:0">Conti</h2><button class="sm" onclick="addAccount()">+ Conto</button></div>
+      <p class="small mut" style="margin:0 0 8px">Anagrafica dei conti (i saldi si aggiornano nella scheda Mensile).</p>
+      <table id="accConfig"></table>
+    </div>
+
+    <div class="card">
+      <div class="row between" style="margin-bottom:10px"><h2 style="margin:0">Envelope — struttura</h2><button class="sm" onclick="addEnvelope()">+ Nuovo conto</button></div>
+      <p class="small mut" style="margin:0 0 8px">Nome, peso (fisso/variabile), target, conto e sotto-voci. Il saldo si aggiorna nella scheda Mensile.</p>
+      <div id="envsConfig"></div>
+    </div>
+
+    <div class="card">
       <h2>Calcolatore: scadenza → quota mensile</h2>
-      <p class="small mut">Dimmi cosa devi pagare, quanto e entro quando. Ti dico quanto mettere via ogni mese.</p>
-      <div class="grid" style="gap:10px">
+      <p class="small mut" style="margin-top:0">Cosa devi pagare, quanto, entro quando → quanto mettere via al mese.</p>
+      <div class="grid" style="gap:10px;max-width:560px">
         <label class="f">Cosa <input id="c_name" placeholder="es. Bollo auto"></label>
         <div class="row" style="gap:10px">
-          <label class="f grow">Importo da raggiungere (€) <input id="c_amount" type="number" step="1" value="1000"></label>
+          <label class="f grow">Importo (€) <input id="c_amount" type="number" step="1" value="1000"></label>
           <label class="f grow">Già accantonato (€) <input id="c_saved" type="number" step="1" value="0"></label>
         </div>
         <div class="row" style="gap:10px">
           <label class="f grow">Entro il <input id="c_date" type="date"></label>
           <label class="f grow">Ricorrente?
             <select id="c_recur">
-              <option value="0">No, una tantum</option>
-              <option value="12">Sì, ogni anno</option>
-              <option value="6">Sì, ogni 6 mesi</option>
-              <option value="3">Sì, ogni 3 mesi</option>
-              <option value="1">Sì, ogni mese</option>
-            </select>
-          </label>
+              <option value="0">No, una tantum</option><option value="12">Ogni anno</option>
+              <option value="6">Ogni 6 mesi</option><option value="3">Ogni 3 mesi</option><option value="1">Ogni mese</option>
+            </select></label>
         </div>
         <button class="primary" onclick="runCalc()">Calcola</button>
       </div>
       <div id="c_out"></div>
     </div>
-  </section>
 
-  <!-- ACCOUNTS -->
-  <section id="t-acc" class="hide">
     <div class="card">
-      <div class="row between" style="margin-bottom:10px">
-        <h2 style="margin:0">Conti & patrimonio</h2>
-        <button class="sm" onclick="addAccount()">+ Conto</button>
-      </div>
-      <table id="accTable"></table>
-      <div class="kpi" style="margin-top:14px">
-        <div class="b"><div class="l">Patrimonio totale</div><div class="v" id="patrimony">—</div></div>
+      <h2>Dati &amp; backup</h2>
+      <div class="tools">
+        <button class="ghost sm" onclick="exportJSON()">⬇ Export JSON</button>
+        <button class="ghost sm" onclick="document.getElementById('imp').click()">⬆ Import JSON</button>
+        <input id="imp" type="file" accept="application/json" class="hide" onchange="importJSON(this)">
+        <button class="ghost sm danger" onclick="resetAll()">Reset (dati di partenza)</button>
       </div>
     </div>
   </section>
 
-  <!-- HISTORY -->
+  <!-- ============ STORICO ============ -->
   <section id="t-hist" class="hide">
     <div class="card">
       <div class="row between" style="margin-bottom:10px">
-        <h2 style="margin:0">Storico mensile</h2>
-        <button class="primary sm" onclick="archiveMonth()">📌 Archivia situazione del mese</button>
+        <h2 style="margin:0">Storico &amp; statistiche</h2>
+        <button class="primary sm" onclick="archiveMonth()">📌 Archivia mese</button>
       </div>
-      <p class="small mut" style="margin-top:0">Ogni archiviazione salva una "fotografia" di saldi, versamenti e patrimonio nel database (tab snapshot). Da qui nascono i grafici di andamento.</p>
       <div id="histChart"></div>
       <div id="histPat"></div>
       <div id="histBody"></div>
     </div>
   </section>
 
-  <!-- SYNC -->
-  <section id="t-sync" class="hide">
-    <div class="card" style="max-width:680px">
-      <h2>Sincronizza con Google Sheet</h2>
-      <p class="small mut" style="margin-top:0">Il foglio <b>Budget — Database</b> è il database: un tab per tabella (account, envelope, config, snapshot). Serve incollare una volta lo script aggiornato (<code>AppsScript.gs</code>) e mettere qui l'URL della Web App.</p>
-      <label class="f">URL Web App (finisce con <code>/exec</code>)
-        <input id="sheetUrl" placeholder="https://script.google.com/macros/s/.../exec">
-      </label>
-      <div class="tools" style="margin-top:12px">
-        <button class="primary sm" onclick="connectSheet()">Connetti & carica dal Sheet</button>
-        <button class="sm" onclick="pullRemote(true)">⬇ Carica dal Sheet</button>
-        <button class="sm" onclick="pushRemote(true)">⬆ Salva sul Sheet ora</button>
-        <button class="sm ghost danger" onclick="disconnectSheet()">Disconnetti</button>
-      </div>
-      <div class="note" id="syncMsg">Non connesso. L'app sta salvando solo nel browser.</div>
-      <div class="small mut" style="margin-top:10px;line-height:1.7">
-        <b>Hai aggiornato lo script?</b> Dopo aver incollato la nuova versione devi <i>ripubblicarla</i>: Distribuisci ▸ Gestisci deployment ▸ matita ▸ Versione "Nuova versione" ▸ Distribuisci. L'URL resta lo stesso.
-      </div>
-    </div>
-  </section>
-
-  <!-- INFO -->
+  <!-- ============ INFO ============ -->
   <section id="t-info" class="hide">
     <div class="card" style="max-width:720px">
       <h2>Come funziona</h2>
       <div class="small" style="line-height:1.7">
-        <p><b>Allocazione.</b> Dallo stipendio si tolgono prima i conti <b>fissi</b>; quel che resta (il <i>parziale</i>) viene diviso tra i conti <b>variabili</b> in percentuale.</p>
-        <p><b>Peso per conto:</b> <span class="pill fix">fisso</span> somma uguale ogni mese · <span class="pill pct">variabile %</span> percentuale del parziale. Per i fissi puoi spuntare <span class="pill sum">importo = somma figli</span>.</p>
-        <p><b>Albero.</b> Ogni conto può avere sotto-voci (importo + cadenza). Nel database sono righe della tabella <code>envelope</code> con <code>parent_id</code> = id del conto padre.</p>
-        <p><b>Database.</b> I dati vivono nel Google Sheet, una tabella per tab: <code>account</code>, <code>envelope</code>, <code>config</code>, più <code>snapshot</code> per lo storico. Modello già relazionale: il giorno che si passa a Supabase si cambia solo l'adapter dati.</p>
-        <p><b>Backup.</b> Copia locale automatica nel browser + Export/Import JSON.</p>
+        <p><b>Distribuzione.</b> Pagina di sola lettura: ti dice quanto versare su ogni conto (bonifici) e in ogni envelope. La usi quando fai i giroconti.</p>
+        <p><b>Mensile.</b> Inserisci le variabili del mese: stipendio, saldi dei conti, residui delle envelope. Poi "Archivia" per congelare la fotografia nello storico.</p>
+        <p><b>Admin.</b> Le costanti: conti, struttura envelope (nome, peso <span class="pill fix">fisso</span>/<span class="pill pct">variabile %</span>, target, albero di sotto-voci via <code>parent_id</code>), calcolatore, sincronizzazione e backup.</p>
+        <p><b>Allocazione.</b> Dallo stipendio si tolgono i conti fissi; il <i>parziale</i> si divide tra i variabili in percentuale. Oltre il target, il surplus è "overbudget".</p>
+        <p><b>Database.</b> Google Sheet, una tabella per tab (<code>account</code>, <code>envelope</code>, <code>config</code>, <code>snapshot</code>). Modello relazionale, pronto per Supabase domani.</p>
       </div>
     </div>
   </section>
@@ -237,23 +243,15 @@
 <div id="toast" class="toast"></div>
 
 <script>
-/* ============================================================
-   STORAGE — adapter pattern.
-   Locale (cache nel browser) + Remote (Google Sheet via Apps Script).
-   Domani: SupabaseAdapter con la stessa interfaccia load()/save().
-   ============================================================ */
+/* ============ STORAGE: locale + Google Sheet (Apps Script) ============ */
 const KEY = 'budget_envelope_v2';
 const SHEET_KEY = 'budget_sheet_url';
-
 const LocalStore = {
   load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } },
   save(state){ localStorage.setItem(KEY, JSON.stringify(state)); }
 };
-
 let sheetURL = localStorage.getItem(SHEET_KEY) || '';
 let syncTimer = null;
-
-/* mapping STATO APP  <->  RIGHE TABELLE (Sheet)  */
 const toBool = v => v===true || v==='TRUE' || v==='true' || v===1;
 const num = v => { const n = parseFloat(v); return isFinite(n)? n : 0; };
 
@@ -286,50 +284,28 @@ function tablesToState(d){
     updated: new Date().toISOString()
   };
 }
-
 const Remote = {
   enabled(){ return !!sheetURL; },
-  async load(){
-    const r = await fetch(sheetURL, {method:'GET'});
-    const j = await r.json();
-    if(!j.ok) throw new Error(j.error||'risposta non valida');
-    return tablesToState(j.data||{});
-  },
-  async save(S){
-    const r = await fetch(sheetURL, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body: JSON.stringify({ action:'save', state: stateToTables(S) })});
-    const j = await r.json(); if(!j.ok) throw new Error(j.error||'salvataggio fallito');
-  },
-  async snapshot(snapRows, accRows){
-    const r = await fetch(sheetURL, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body: JSON.stringify({ action:'snapshot', snapshot:snapRows, accountSnapshot:accRows })});
-    const j = await r.json(); if(!j.ok) throw new Error(j.error||'snapshot fallito');
-  }
+  async load(){ const r=await fetch(sheetURL,{method:'GET'}); const j=await r.json(); if(!j.ok) throw new Error(j.error||'risposta non valida'); return tablesToState(j.data||{}); },
+  async save(S){ const r=await fetch(sheetURL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'save',state:stateToTables(S)})}); const j=await r.json(); if(!j.ok) throw new Error(j.error||'salvataggio fallito'); },
+  async snapshot(snapRows,accRows){ const r=await fetch(sheetURL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'snapshot',snapshot:snapRows,accountSnapshot:accRows})}); const j=await r.json(); if(!j.ok) throw new Error(j.error||'snapshot fallito'); }
 };
 
-/* ============================================================
-   STATE + SEED
-   ============================================================ */
+/* ============ STATE + SEED (neutro, senza dati personali) ============ */
 let S = null;
 const uid = () => Math.random().toString(36).slice(2,9);
-
 function seed(){
-  // SEED NEUTRO: solo struttura e nomi, ZERO cifre personali.
-  // I dati reali vivono nel Google Sheet e vengono caricati con Sync.
   const accounts = [
-    {id:'isp',  name:'Intesa (ISP)', invest:false, balance:0},
-    {id:'hype', name:'Hype',         invest:false, balance:0},
-    {id:'rev',  name:'Revolut',      invest:false, balance:0},
-    {id:'etoro',name:'eToro',        invest:true,  balance:0},
-    {id:'scal', name:'Scalable',     invest:true,  balance:0},
-    {id:'liq',  name:'Liquidità',    invest:false, balance:0},
+    {id:'isp',name:'Intesa (ISP)',invest:false,balance:0},
+    {id:'hype',name:'Hype',invest:false,balance:0},
+    {id:'rev',name:'Revolut',invest:false,balance:0},
+    {id:'etoro',name:'eToro',invest:true,balance:0},
+    {id:'scal',name:'Scalable',invest:true,balance:0},
+    {id:'liq',name:'Liquidità',invest:false,balance:0},
   ];
-  const M = (id,name,weight,o={}) => Object.assign({id,parentId:null,kind:'macro',name,accountId:'rev',
-    weight,percent:0,fixedMonthly:0,sumChildren:false,target:0,balance:0,amount:0,cadence:1,open:false}, o);
-  const I = (parentId,name,cadence) => ({id:uid(),parentId,kind:'item',name,amount:0,cadence,
-    weight:'',percent:0,fixedMonthly:0,sumChildren:false,target:0,accountId:null,balance:0,open:false});
-
-  const envelopes = [
+  const M=(id,name,weight,o={})=>Object.assign({id,parentId:null,kind:'macro',name,accountId:'rev',weight,percent:0,fixedMonthly:0,sumChildren:false,target:0,balance:0,amount:0,cadence:1,open:false},o);
+  const I=(parentId,name,cadence)=>({id:uid(),parentId,kind:'item',name,amount:0,cadence,weight:'',percent:0,fixedMonthly:0,sumChildren:false,target:0,accountId:null,balance:0,open:false});
+  const envelopes=[
     M('e_rischi','Fondo rischi','percent'),
     M('e_inv','Fondo investimenti','percent',{accountId:'hype'}),
     M('e_svago','Fondo svago','percent'),
@@ -337,9 +313,7 @@ function seed(){
     M('e_ai','Fondo AI','percent'),
     M('e_reg','Fondo regali','percent'),
     M('e_auto','Auto / Moto','fixed'),
-      I('e_auto','Bollo auto',12),
-      I('e_auto','Assicurazione',12),
-      I('e_auto','Tagliando / manutenzione',12),
+      I('e_auto','Bollo auto',12), I('e_auto','Assicurazione',12), I('e_auto','Tagliando / manutenzione',12),
     M('e_abb','Abbonamenti mensili','fixed'),
       I('e_abb','SIM telefonica',1),
     M('e_benz','Benzina','fixed'),
@@ -348,16 +322,9 @@ function seed(){
   return { salary:0, accounts, envelopes, snapshots:[], accountSnapshots:[], updated:new Date().toISOString() };
 }
 
-/* Nota: il SALDO (balance) dei conti-budget è uno stato corrente; lo teniamo nel
-   modello e nello storico (snapshot). Nel tab envelope non c'è una colonna balance
-   separata per scelta — il saldo "vivo" è in localStorage e nelle snapshot. */
-
-/* ============================================================
-   CALCOLI
-   ============================================================ */
+/* ============ CALCOLI ============ */
 const eur = n => (isFinite(n)?n:0).toLocaleString('it-IT',{style:'currency',currency:'EUR',maximumFractionDigits:2});
 const eur0 = n => (isFinite(n)?n:0).toLocaleString('it-IT',{style:'currency',currency:'EUR',maximumFractionDigits:0});
-
 const macros = () => S.envelopes.filter(e=>e.kind==='macro');
 const childrenOf = id => S.envelopes.filter(e=>e.kind==='item' && e.parentId===id);
 function childMonthly(c){ const cad=+c.cadence||1; return (+c.amount||0)/cad; }
@@ -368,33 +335,70 @@ function parziale(){ return (+S.salary||0) - fixedBlock(); }
 function pctSum(){ return macros().filter(e=>e.weight==='percent').reduce((s,e)=>s+(+e.percent||0),0); }
 function allocation(e){ return e.weight==='percent' ? parziale()*(+e.percent||0) : fixedAmount(e); }
 function deposit(e){ const q=allocation(e), t=+e.target||0, b=+e.balance||0; const add=(b+q>=t)?Math.max(0,t-b):q; return {add, over:q-add, quota:q}; }
+function accountName(id){ const a=S.accounts.find(x=>x.id===id); return a?a.name:'(nessun conto)'; }
 
-/* ============================================================
-   RENDER
-   ============================================================ */
+/* ============ RENDER ============ */
 function render(){
-  document.getElementById('salary').value = S.salary;
-  renderKPI(); renderEnvs(); renderDeposits(); renderAccounts(); renderHistory();
+  const sal=document.getElementById('salary'); if(sal) sal.value=S.salary;
+  renderKPI(); renderBonifici(); renderDeposits();
+  renderAccBalances(); renderEnvBalances();
+  renderAccConfig(); renderEnvs();
+  renderHistory();
 }
 function renderKPI(){
   const fx=fixedBlock(), pz=parziale(), ps=pctSum();
-  const totAlloc = macros().reduce((s,e)=>s+allocation(e),0);
-  document.getElementById('kpi').innerHTML = `
+  const totAlloc=macros().reduce((s,e)=>s+allocation(e),0);
+  document.getElementById('kpi').innerHTML=`
     <div class="b"><div class="l">Stipendio</div><div class="v">${eur0(S.salary)}</div></div>
     <div class="b"><div class="l">Blocco fisso</div><div class="v">${eur0(fx)}</div></div>
     <div class="b"><div class="l">Parziale</div><div class="v">${eur0(pz)}</div></div>
     <div class="b"><div class="l">Allocato</div><div class="v">${eur0(totAlloc)}</div></div>`;
   const r=document.getElementById('reconc'); const diff=(+S.salary||0)-totAlloc;
-  if(Math.abs(ps-1)>0.001) r.innerHTML=`⚠️ Le percentuali sommano <b>${(ps*100).toFixed(0)}%</b> (dovrebbero fare 100%). Non distribuito: ${eur(pz*(1-ps))}.`;
-  else if(Math.abs(diff)<0.5) r.innerHTML=`✅ I conti tornano: stipendio interamente allocato.`;
+  if(Math.abs(ps-1)>0.001) r.innerHTML=`⚠️ Le percentuali sommano <b>${(ps*100).toFixed(0)}%</b> (dovrebbero fare 100%).`;
+  else if(Math.abs(diff)<0.5) r.innerHTML=`✅ Stipendio interamente allocato.`;
   else r.innerHTML=`Residuo non allocato: <b>${eur(diff)}</b>.`;
 }
-function modePill(e){
-  if(e.weight==='percent') return '<span class="pill pct">variabile '+Math.round((e.percent||0)*100)+'%</span>';
-  return '<span class="pill fix">fisso</span>'+(e.sumChildren?' <span class="pill sum">da figli</span>':'');
+function renderBonifici(){
+  const byAcc={}; macros().forEach(e=>{ const add=deposit(e).add; if(add>0.005) byAcc[e.accountId]=(byAcc[e.accountId]||0)+add; });
+  const rows=S.accounts.filter(a=>byAcc[a.id]).map(a=>({name:a.name,v:byAcc[a.id]}));
+  const host=document.getElementById('bonifici');
+  if(!rows.length){ host.innerHTML='<p class="mut small">Nessun versamento da fare.</p>'; return; }
+  let tot=0, html='<table><tr><th>Conto</th><th>Da versare</th></tr>';
+  rows.forEach(r=>{ tot+=r.v; html+=`<tr><td>${r.name}</td><td>${eur(r.v)}</td></tr>`; });
+  html+=`<tr><th>Totale</th><th>${eur(tot)}</th></tr></table>`;
+  host.innerHTML=html;
 }
+function renderDeposits(){
+  const t=document.getElementById('deposits'); let tot=0,totOver=0;
+  let html=`<tr><th>Envelope</th><th>Conto</th><th>Versa</th><th>Overbudget</th></tr>`;
+  macros().forEach(e=>{ const d=deposit(e); tot+=d.add; totOver+=d.over;
+    html+=`<tr><td>${e.name}</td><td class="mut small">${accountName(e.accountId)}</td><td>${eur(d.add)}</td><td class="mut">${d.over>0.005?eur(d.over):'—'}</td></tr>`; });
+  html+=`<tr><th>Totale</th><th></th><th>${eur(tot)}</th><th>${eur(totOver)}</th></tr>`;
+  t.innerHTML=html;
+}
+function renderAccBalances(){
+  let html='<tr><th>Conto</th><th>Saldo attuale</th></tr>';
+  S.accounts.forEach(a=>{ html+=`<tr><td>${a.name} <span class="mut small">${a.invest?'· investito':''}</span></td><td><input type="number" step="1" value="${a.balance||0}" onchange="setAcc('${a.id}','balance',+this.value)" style="width:130px"></td></tr>`; });
+  const pat=S.accounts.reduce((s,a)=>s+(+a.balance||0),0);
+  html+=`<tr><th>Patrimonio</th><th>${eur(pat)}</th></tr>`;
+  document.getElementById('accBalances').innerHTML=html;
+}
+function renderEnvBalances(){
+  let html='<tr><th>Envelope</th><th>Residuo</th><th>Target</th></tr>';
+  macros().forEach(e=>{ html+=`<tr><td>${e.name}</td><td><input type="number" step="1" value="${e.balance||0}" onchange="setField('${e.id}','balance',+this.value)" style="width:120px"></td><td class="mut">${e.target>=1000000?'∞':eur0(e.target)}</td></tr>`; });
+  document.getElementById('envBalances').innerHTML=html;
+}
+function renderAccConfig(){
+  let html='<tr><th>Conto</th><th>Tipo</th><th></th></tr>';
+  S.accounts.forEach(a=>{ html+=`<tr>
+    <td><input value="${a.name}" onchange="setAcc('${a.id}','name',this.value)" style="width:160px"></td>
+    <td><select onchange="setAcc('${a.id}','invest',this.value==='1')"><option value="0" ${!a.invest?'selected':''}>liquido</option><option value="1" ${a.invest?'selected':''}>investito</option></select></td>
+    <td><button class="icon ghost danger" onclick="delAcc('${a.id}')">✕</button></td></tr>`; });
+  document.getElementById('accConfig').innerHTML=html;
+}
+function modePill(e){ if(e.weight==='percent') return '<span class="pill pct">variabile '+Math.round((e.percent||0)*100)+'%</span>'; return '<span class="pill fix">fisso</span>'+(e.sumChildren?' <span class="pill sum">da figli</span>':''); }
 function renderEnvs(){
-  const host=document.getElementById('envs'); host.innerHTML='';
+  const host=document.getElementById('envsConfig'); host.innerHTML='';
   macros().forEach(e=>{
     const q=allocation(e), t=+e.target||0, b=+e.balance||0;
     const prog=t>0?Math.min(100,(b/t)*100):0, over=b>=t&&t>0;
@@ -414,7 +418,7 @@ function renderEnvs(){
 }
 function renderKids(e){
   const k=document.getElementById('kids-'+e.id); if(!k) return;
-  let rows = `
+  let rows=`
     <div class="row" style="gap:10px;flex-wrap:wrap;margin-bottom:8px">
       <label class="f" style="flex-direction:row;align-items:center;gap:6px">Nome
         <input value="${e.name}" style="width:170px" onchange="setField('${e.id}','name',this.value)"></label>
@@ -429,8 +433,6 @@ function renderKids(e){
         <input type="number" step="1" style="width:90px" value="${e.sumChildren?childrenMonthly(e).toFixed(2):e.fixedMonthly}" ${e.sumChildren?'disabled':''} onchange="setField('${e.id}','fixedMonthly',+this.value)"></label>
       <label class="f" style="flex-direction:row;align-items:center;gap:6px">
         <input type="checkbox" style="width:auto" ${e.sumChildren?'checked':''} onchange="setField('${e.id}','sumChildren',this.checked)"> importo = somma figli</label>`:''}
-      <label class="f" style="flex-direction:row;align-items:center;gap:6px">Saldo
-        <input type="number" step="1" style="width:100px" value="${e.balance}" onchange="setField('${e.id}','balance',+this.value)"></label>
       <label class="f" style="flex-direction:row;align-items:center;gap:6px">Target
         <input type="number" step="1" style="width:110px" value="${e.target}" onchange="setField('${e.id}','target',+this.value)"></label>
       <label class="f" style="flex-direction:row;align-items:center;gap:6px">Conto
@@ -441,97 +443,63 @@ function renderKids(e){
     </div>
     <div class="kid mut small"><span>Sotto-voce</span><span class="right">importo €</span><span class="right">cadenza</span><span class="right">€/mese</span><span></span></div>`;
   childrenOf(e.id).forEach(c=>{
-    rows += `<div class="kid">
+    rows+=`<div class="kid">
       <input value="${c.name}" onchange="setKid('${c.id}','name',this.value)">
       <input type="number" step="1" value="${c.amount}" onchange="setKid('${c.id}','amount',+this.value)">
       <select onchange="setKid('${c.id}','cadence',+this.value)">
         ${[[1,'mensile'],[3,'trimestrale'],[6,'semestrale'],[12,'annuale']].map(o=>`<option value="${o[0]}" ${+c.cadence===o[0]?'selected':''}>${o[1]}</option>`).join('')}
       </select>
       <span class="mEq">${eur(childMonthly(c))}</span>
-      <button class="icon ghost danger" onclick="delKid('${c.id}')">✕</button>
-    </div>`;
+      <button class="icon ghost danger" onclick="delKid('${c.id}')">✕</button></div>`;
   });
-  rows += `<button class="sm" style="margin-top:8px" onclick="addKid('${e.id}')">+ sotto-voce</button>`;
-  if(e.weight==='fixed' && e.sumChildren) rows += `<div class="note">Importo fisso = somma sotto-voci = <b>${eur(childrenMonthly(e))}/mese</b>.</div>`;
-  else if(childrenOf(e.id).length) rows += `<div class="note">Composizione: ${eur(childrenMonthly(e))}/mese di sotto-voci ${e.weight==='fixed'?'(spunta "importo = somma figli" per usarla)':'(informativa)'}.</div>`;
+  rows+=`<button class="sm" style="margin-top:8px" onclick="addKid('${e.id}')">+ sotto-voce</button>`;
+  if(e.weight==='fixed' && e.sumChildren) rows+=`<div class="note">Importo fisso = somma sotto-voci = <b>${eur(childrenMonthly(e))}/mese</b>.</div>`;
+  else if(childrenOf(e.id).length) rows+=`<div class="note">Composizione: ${eur(childrenMonthly(e))}/mese ${e.weight==='fixed'?'(spunta "importo = somma figli" per usarla)':'(informativa)'}.</div>`;
   k.innerHTML=rows;
 }
-function renderDeposits(){
-  const t=document.getElementById('deposits'); let tot=0, totOver=0;
-  let html=`<tr><th>Conto</th><th>Versa</th><th>Overbudget</th></tr>`;
-  macros().forEach(e=>{ const d=deposit(e); tot+=d.add; totOver+=d.over;
-    html+=`<tr><td>${e.name}</td><td>${eur(d.add)}</td><td class="mut">${d.over>0.005?eur(d.over):'—'}</td></tr>`;});
-  html+=`<tr><th>Totale</th><th>${eur(tot)}</th><th>${eur(totOver)}</th></tr>`;
-  t.innerHTML=html;
-}
-function renderAccounts(){
-  const t=document.getElementById('accTable');
-  let html=`<tr><th>Conto</th><th>Saldo</th><th>Tipo</th><th></th></tr>`;
-  S.accounts.forEach(a=>{
-    html+=`<tr>
-      <td><input value="${a.name}" onchange="setAcc('${a.id}','name',this.value)" style="width:160px"></td>
-      <td><input type="number" step="1" value="${a.balance||0}" onchange="setAcc('${a.id}','balance',+this.value)" style="width:120px"></td>
-      <td><select onchange="setAcc('${a.id}','invest',this.value==='1')"><option value="0" ${!a.invest?'selected':''}>liquido</option><option value="1" ${a.invest?'selected':''}>investito</option></select></td>
-      <td><button class="icon ghost danger" onclick="delAcc('${a.id}')">✕</button></td></tr>`;
-  });
-  t.innerHTML=html;
-  const pat=S.accounts.reduce((s,a)=>s+(+a.balance||0),0);
-  document.getElementById('patrimony').textContent=eur(pat);
-}
-function lineChartSVG(points){ // points: [{label,value}]  (ordine cronologico)
-  const W=680,H=220,pl=58,pr=16,pt=16,pb=30, iw=W-pl-pr, ih=H-pt-pb;
+
+/* ---- storico + grafici ---- */
+function lineChartSVG(points){
+  const W=680,H=200,pl=58,pr=16,pt=14,pb=28,iw=W-pl-pr,ih=H-pt-pb;
   const max=Math.max(1,...points.map(p=>p.value)); const niceMax=Math.ceil(max/1000)*1000||max;
-  const x=i=>points.length<=1?pl+iw/2:pl+iw*i/(points.length-1);
-  const y=v=>pt+ih-(v/niceMax)*ih;
+  const x=i=>points.length<=1?pl+iw/2:pl+iw*i/(points.length-1); const y=v=>pt+ih-(v/niceMax)*ih;
   let g='';
-  for(let k=0;k<=4;k++){ const gy=pt+ih*k/4, val=niceMax*(1-k/4);
-    g+=`<line x1="${pl}" y1="${gy}" x2="${W-pr}" y2="${gy}" stroke="#2c3845"/>`+
-       `<text x="${pl-8}" y="${gy+4}" fill="#93a1b0" font-size="11" text-anchor="end">${Math.round(val/1000)}k</text>`; }
-  const pts=points.map((p,i)=>`${x(i)},${y(p.value)}`).join(' ');
-  if(points.length>1) g+=`<polyline points="${pts}" fill="none" stroke="#4ea1ff" stroke-width="2"/>`;
-  points.forEach((p,i)=>{ g+=`<circle cx="${x(i)}" cy="${y(p.value)}" r="3.5" fill="#4ea1ff"/>`+
-    `<text x="${x(i)}" y="${H-10}" fill="#93a1b0" font-size="10" text-anchor="middle">${p.label}</text>`; });
+  for(let kk=0;kk<=4;kk++){ const gy=pt+ih*kk/4, val=niceMax*(1-kk/4);
+    g+=`<line x1="${pl}" y1="${gy}" x2="${W-pr}" y2="${gy}" stroke="#2c3845"/><text x="${pl-8}" y="${gy+4}" fill="#93a1b0" font-size="11" text-anchor="end">${Math.round(val/1000)}k</text>`; }
+  if(points.length>1) g+=`<polyline points="${points.map((p,i)=>x(i)+','+y(p.value)).join(' ')}" fill="none" stroke="#4ea1ff" stroke-width="2"/>`;
+  points.forEach((p,i)=>{ g+=`<circle cx="${x(i)}" cy="${y(p.value)}" r="3.5" fill="#4ea1ff"/><text x="${x(i)}" y="${H-9}" fill="#93a1b0" font-size="10" text-anchor="middle">${p.label}</text>`; });
   return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;max-width:${W}px">${g}</svg>`;
 }
-function barChartSVG(items){ // items: [{label,value}]
-  const W=680, rowH=26, pl=150, pr=70, H=items.length*rowH+10, iw=W-pl-pr;
-  const max=Math.max(1,...items.map(i=>i.value));
-  let g='';
+function barChartSVG(items, fmt){
+  fmt=fmt||eur0; const W=680, rowH=26, pl=150, pr=70, H=items.length*rowH+10, iw=W-pl-pr;
+  const max=Math.max(1,...items.map(i=>i.value)); let g='';
   items.forEach((it,i)=>{ const yy=i*rowH+6, bw=Math.max(2,iw*it.value/max);
-    g+=`<text x="${pl-8}" y="${yy+13}" fill="#e7edf3" font-size="12" text-anchor="end">${it.label}</text>`+
-       `<rect x="${pl}" y="${yy+3}" width="${bw}" height="14" rx="3" fill="#37c98b"/>`+
-       `<text x="${pl+bw+6}" y="${yy+14}" fill="#93a1b0" font-size="11">${eur0(it.value)}</text>`; });
+    g+=`<text x="${pl-8}" y="${yy+13}" fill="#e7edf3" font-size="12" text-anchor="end">${it.label}</text><rect x="${pl}" y="${yy+3}" width="${bw}" height="14" rx="3" fill="#37c98b"/><text x="${pl+bw+6}" y="${yy+14}" fill="#93a1b0" font-size="11">${fmt(it.value)}</text>`; });
   return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;max-width:${W}px">${g}</svg>`;
 }
 function renderHistory(){
   const periods=[...new Set((S.snapshots||[]).map(s=>s.period))].sort().reverse();
-  const chart=document.getElementById('histChart');
-  const pat=document.getElementById('histPat'), body=document.getElementById('histBody');
-  if(!periods.length){ if(chart) chart.innerHTML=''; pat.innerHTML=''; body.innerHTML=`<p class="mut small">Ancora nessuna fotografia. Premi "Archivia situazione del mese" per iniziare lo storico.</p>`; return; }
-  // grafici
-  if(chart){
-    const asc=[...periods].reverse();
-    const patPoints=asc.map(p=>({label:p, value:(S.accountSnapshots||[]).filter(s=>s.period===p).reduce((s,x)=>s+x.balance,0)}));
-    const last=periods[0];
-    const bars=S.snapshots.filter(s=>s.period===last).map(s=>({label:s.name, value:s.balance}));
-    chart.innerHTML=`<h2 style="margin:10px 0 6px">Patrimonio nel tempo</h2>${lineChartSVG(patPoints)}
-      <h2 style="margin:18px 0 6px">Saldi per envelope · ${last}</h2>${barChartSVG(bars)}`;
-  }
-  // patrimonio per periodo
-  let ph=`<table><tr><th>Mese</th><th>Patrimonio</th></tr>`;
+  const chart=document.getElementById('histChart'), pat=document.getElementById('histPat'), body=document.getElementById('histBody');
+  if(!chart) return;
+  if(!periods.length){ chart.innerHTML=''; pat.innerHTML=''; body.innerHTML=`<p class="mut small">Ancora nessuna fotografia. Premi "Archivia mese" per iniziare lo storico.</p>`; return; }
+  const asc=[...periods].reverse(); const last=periods[0];
+  const patPoints=asc.map(p=>({label:p,value:(S.accountSnapshots||[]).filter(s=>s.period===p).reduce((s,x)=>s+x.balance,0)}));
+  const versato=asc.map(p=>({label:p,value:S.snapshots.filter(s=>s.period===p).reduce((s,x)=>s+x.deposited,0)}));
+  const saldi=S.snapshots.filter(s=>s.period===last).map(s=>({label:s.name,value:s.balance}));
+  chart.innerHTML=`<h3 class="sec">Patrimonio nel tempo</h3>${lineChartSVG(patPoints)}
+    <h3 class="sec">Versato per mese</h3>${barChartSVG(versato)}
+    <h3 class="sec">Saldi per envelope · ${last}</h3>${barChartSVG(saldi)}`;
+  let ph=`<h3 class="sec">Patrimonio — tabella</h3><table><tr><th>Mese</th><th>Patrimonio</th><th>Versato</th></tr>`;
   periods.forEach(p=>{ const v=(S.accountSnapshots||[]).filter(s=>s.period===p).reduce((s,x)=>s+x.balance,0);
-    ph+=`<tr><td>${p}</td><td>${eur(v)}</td></tr>`; });
-  ph+=`</table>`; pat.innerHTML=`<h2 style="margin:18px 0 8px">Patrimonio — tabella</h2>`+ph;
-  // dettaglio ultimo periodo
-  const last=periods[0];
-  let dh=`<h2 style="margin:18px 0 8px">Dettaglio ${last}</h2><table><tr><th>Envelope</th><th>Saldo</th><th>Versato</th><th>Overbudget</th></tr>`;
+    const dep=S.snapshots.filter(s=>s.period===p).reduce((s,x)=>s+x.deposited,0);
+    ph+=`<tr><td>${p}</td><td>${eur(v)}</td><td class="mut">${eur(dep)}</td></tr>`; });
+  ph+=`</table>`; pat.innerHTML=ph;
+  let dh=`<h3 class="sec">Dettaglio ${last}</h3><table><tr><th>Envelope</th><th>Saldo</th><th>Versato</th><th>Overbudget</th></tr>`;
   S.snapshots.filter(s=>s.period===last).forEach(s=>{ dh+=`<tr><td>${s.name}</td><td>${eur(s.balance)}</td><td>${eur(s.deposited)}</td><td class="mut">${s.overbudget>0.005?eur(s.overbudget):'—'}</td></tr>`; });
   dh+=`</table>`; body.innerHTML=dh;
 }
 
-/* ============================================================
-   AZIONI
-   ============================================================ */
+/* ============ AZIONI ============ */
 function commit(){ S.updated=new Date().toISOString(); LocalStore.save(S); render(); scheduleSync(); }
 function migrate(){
   if(!S.envelopes) S.envelopes=[];
@@ -560,25 +528,18 @@ function delKid(id){ S.envelopes=S.envelopes.filter(e=>e.id!==id); commit(); }
 function addAccount(){ S.accounts.push({id:uid(),name:'Nuovo conto',balance:0,invest:false}); commit(); }
 function setAcc(id,f,v){ const a=S.accounts.find(x=>x.id===id); a[f]=v; commit(); }
 function delAcc(id){ S.accounts=S.accounts.filter(a=>a.id!==id); commit(); }
-document.getElementById('salary').addEventListener('change',e=>{ S.salary=+e.target.value||0; commit(); });
 
-/* ---- storico ---- */
 function archiveMonth(){
-  const period = new Date().toISOString().slice(0,7); // YYYY-MM
-  const now = new Date().toISOString();
-  if((S.snapshots||[]).some(s=>s.period===period)){ if(!confirm('Esiste già una fotografia di '+period+'. Aggiungerne un altra?')) return; }
+  const period=new Date().toISOString().slice(0,7), now=new Date().toISOString();
+  if((S.snapshots||[]).some(s=>s.period===period)){ if(!confirm('Esiste già una fotografia di '+period+'. Aggiungerne una?')) return; }
   const snapRows=[], accRows=[];
   macros().forEach(e=>{ const d=deposit(e);
-    const row={period, envelope_id:e.id, name:e.name, balance:+e.balance||0, allocated:allocation(e), deposited:d.add, overbudget:d.over, created_at:now};
-    snapRows.push(row);
-    S.snapshots.push({period, envelopeId:e.id, name:e.name, balance:+e.balance||0, allocated:allocation(e), deposited:d.add, overbudget:d.over, createdAt:now});
-  });
-  S.accounts.forEach(a=>{ const row={period, account_id:a.id, name:a.name, balance:+a.balance||0, created_at:now};
-    accRows.push(row);
-    S.accountSnapshots.push({period, accountId:a.id, name:a.name, balance:+a.balance||0, createdAt:now});
-  });
+    snapRows.push({period,envelope_id:e.id,name:e.name,balance:+e.balance||0,allocated:allocation(e),deposited:d.add,overbudget:d.over,created_at:now});
+    S.snapshots.push({period,envelopeId:e.id,name:e.name,balance:+e.balance||0,allocated:allocation(e),deposited:d.add,overbudget:d.over,createdAt:now}); });
+  S.accounts.forEach(a=>{ accRows.push({period,account_id:a.id,name:a.name,balance:+a.balance||0,created_at:now});
+    S.accountSnapshots.push({period,accountId:a.id,name:a.name,balance:+a.balance||0,createdAt:now}); });
   LocalStore.save(S); render();
-  if(Remote.enabled()){ Remote.snapshot(snapRows, accRows).then(()=>toast('Mese archiviato nel Sheet ✓')).catch(e=>toast('Archiviato in locale (errore Sheet: '+e.message+')')); }
+  if(Remote.enabled()) Remote.snapshot(snapRows,accRows).then(()=>toast('Mese archiviato nel Sheet ✓')).catch(e=>toast('Archiviato in locale (errore Sheet)'));
   else toast('Mese archiviato in locale ✓');
 }
 
@@ -588,21 +549,18 @@ function syncMsg(t){ const m=document.getElementById('syncMsg'); if(m) m.innerHT
 function scheduleSync(){ if(!Remote.enabled()) return; setBadge('in coda…','pct'); clearTimeout(syncTimer); syncTimer=setTimeout(()=>pushRemote(false),1200); }
 async function pushRemote(manual){
   if(!Remote.enabled()){ if(manual) toast('Nessun Sheet collegato'); return; }
-  try{ setBadge('salvataggio…','pct'); await Remote.save(S); setBadge('sincronizzato ✓','sum');
-    syncMsg('✅ Connesso. Ultimo salvataggio: '+new Date().toLocaleTimeString('it-IT')); if(manual) toast('Salvato sul Sheet ✓'); }
-  catch(e){ setBadge('errore sync','fix'); syncMsg('⚠️ Errore salvataggio: '+e.message+'. Dati comunque salvati in locale.'); }
+  try{ setBadge('salvataggio…','pct'); await Remote.save(S); setBadge('sincronizzato ✓','sum'); syncMsg('✅ Connesso. Ultimo salvataggio: '+new Date().toLocaleTimeString('it-IT')); if(manual) toast('Salvato sul Sheet ✓'); }
+  catch(e){ setBadge('errore sync','fix'); syncMsg('⚠️ Errore salvataggio: '+e.message+'. Dati salvati in locale.'); }
 }
 async function pullRemote(manual){
   if(!Remote.enabled()){ if(manual) toast('Nessun Sheet collegato'); return; }
   try{ setBadge('caricamento…','pct'); const remote=await Remote.load();
     if(remote && remote.envelopes && remote.envelopes.length){
-      // i saldi (balance) non stanno nel tab envelope: li conserviamo dal locale per id
       const balById={}; (S.envelopes||[]).forEach(e=>balById[e.id]=e.balance);
       const accBal={}; (S.accounts||[]).forEach(a=>accBal[a.id]=a.balance);
       remote.envelopes.forEach(e=>{ if(balById[e.id]!==undefined) e.balance=balById[e.id]; });
       remote.accounts.forEach(a=>{ if(accBal[a.id]!==undefined) a.balance=accBal[a.id]; });
-      S=remote; migrate(); LocalStore.save(S); render();
-    }
+      S=remote; migrate(); LocalStore.save(S); render(); }
     setBadge('sincronizzato ✓','sum'); syncMsg('✅ Dati caricati dal Sheet alle '+new Date().toLocaleTimeString('it-IT')); if(manual) toast('Caricato dal Sheet ✓'); }
   catch(e){ setBadge('errore sync','fix'); syncMsg('⚠️ Errore caricamento: '+e.message); }
 }
@@ -616,18 +574,14 @@ function disconnectSheet(){ sheetURL=''; localStorage.removeItem(SHEET_KEY); set
 /* ---- calcolatore ---- */
 function runCalc(){
   const name=document.getElementById('c_name').value||'Obiettivo';
-  const amount=+document.getElementById('c_amount').value||0;
-  const saved=+document.getElementById('c_saved').value||0;
-  const recur=+document.getElementById('c_recur').value||0;
-  const dStr=document.getElementById('c_date').value; const out=document.getElementById('c_out');
+  const amount=+document.getElementById('c_amount').value||0, saved=+document.getElementById('c_saved').value||0;
+  const recur=+document.getElementById('c_recur').value||0, dStr=document.getElementById('c_date').value, out=document.getElementById('c_out');
   if(!dStr){ out.innerHTML=`<div class="note">Imposta una data di scadenza.</div>`; return; }
   const today=new Date(); today.setHours(0,0,0,0); const due=new Date(dStr+'T00:00:00');
   const days=Math.round((due-today)/86400000);
   let months=(due.getFullYear()-today.getFullYear())*12+(due.getMonth()-today.getMonth()); if(due.getDate()<today.getDate()) months--; if(due>today&&months<1) months=1; months=Math.max(0,months);
-  const need=Math.max(0,amount-saved);
-  const monthly = recur>0 ? amount/recur : (months>0?need/months:need);
-  const base = recur>0 ? `Spesa ricorrente da <b>${eur(amount)}</b> ogni <b>${recur} mes${recur>1?'i':'e'}</b>.`
-                       : `Mancano <b>${eur(need)}</b> in <b>${months} mes${months===1?'e':'i'}</b> (${days} giorni).`;
+  const need=Math.max(0,amount-saved); const monthly=recur>0?amount/recur:(months>0?need/months:need);
+  const base=recur>0?`Spesa ricorrente da <b>${eur(amount)}</b> ogni <b>${recur} mes${recur>1?'i':'e'}</b>.`:`Mancano <b>${eur(need)}</b> in <b>${months} mes${months===1?'e':'i'}</b> (${days} giorni).`;
   out.innerHTML=`<div class="calcOut"><div class="small mut">${base}</div><div class="big">${eur(monthly)}/mese</div>
      <div class="tools" style="margin-top:10px">
        <button class="primary sm" onclick='calcToEnv(${JSON.stringify({name,amount,recur,monthly,saved})})'>Crea conto</button>
@@ -635,17 +589,15 @@ function runCalc(){
      </div></div>`;
 }
 function calcToEnv(o){
-  S.envelopes.push({id:uid(),parentId:null,kind:'macro',name:o.name,weight:'fixed',sumChildren:o.recur>0,percent:0,
-    fixedMonthly:o.recur>0?0:Math.round(o.monthly*100)/100,target:o.amount,balance:o.saved||0,amount:0,cadence:1,
-    accountId:S.accounts[0]?.id||'rev',open:true});
+  S.envelopes.push({id:uid(),parentId:null,kind:'macro',name:o.name,weight:'fixed',sumChildren:o.recur>0,percent:0,fixedMonthly:o.recur>0?0:Math.round(o.monthly*100)/100,target:o.amount,balance:o.saved||0,amount:0,cadence:1,accountId:S.accounts[0]?.id||'rev',open:true});
   if(o.recur>0){ const pid=S.envelopes[S.envelopes.length-1].id; S.envelopes.push({id:uid(),parentId:pid,kind:'item',name:o.name,amount:o.amount,cadence:o.recur,weight:'',percent:0,fixedMonthly:0,sumChildren:false,target:0,accountId:null,balance:0,open:false}); }
-  commit(); tab('dash'); toast('Conto creato ✓');
+  commit(); tab('admin'); toast('Conto creato ✓');
 }
 function calcToKid(o){
   const ms=macros(); const pick=prompt('In quale conto?\n'+ms.map((e,i)=>i+': '+e.name).join('\n'));
   const e=ms[+pick]; if(!e) return; e.open=true;
   S.envelopes.push({id:uid(),parentId:e.id,kind:'item',name:o.name,amount:o.amount,cadence:o.recur>0?o.recur:12,weight:'',percent:0,fixedMonthly:0,sumChildren:false,target:0,accountId:null,balance:0,open:false});
-  commit(); tab('dash'); toast('Sotto-voce aggiunta ✓');
+  commit(); tab('admin'); toast('Sotto-voce aggiunta ✓');
 }
 
 /* ---- import/export/reset/ui ---- */
@@ -653,15 +605,15 @@ function exportJSON(){ const blob=new Blob([JSON.stringify(S,null,2)],{type:'app
 function importJSON(inp){ const f=inp.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ S=JSON.parse(r.result); migrate(); commit(); toast('Importato ✓'); }catch(e){ alert('File non valido'); } }; r.readAsText(f); inp.value=''; }
 function resetAll(){ if(confirm('Ripristinare i dati di partenza? Perderai le modifiche non esportate.')){ S=seed(); commit(); toast('Reset eseguito'); } }
 function toggleMenu(){ document.getElementById('nav').classList.toggle('open'); }
-function tab(name){ document.querySelectorAll('.nav button[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===name)); ['dash','calc','acc','hist','sync','info'].forEach(n=>document.getElementById('t-'+n).classList.toggle('hide',n!==name)); document.getElementById('nav').classList.remove('open'); }
+function tab(name){ document.querySelectorAll('.nav button[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===name)); ['distrib','monthly','admin','hist','info'].forEach(n=>document.getElementById('t-'+n).classList.toggle('hide',n!==name)); document.getElementById('nav').classList.remove('open'); }
 let toastT; function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),1900); }
 
 /* ---- boot ---- */
 (function(){
-  S = LocalStore.load();
-  if(!S || !S.envelopes){ S = seed(); LocalStore.save(S); }
+  S=LocalStore.load(); if(!S || !S.envelopes){ S=seed(); LocalStore.save(S); }
   migrate();
   const d=new Date(); d.setMonth(d.getMonth()+1); document.getElementById('c_date').value=d.toISOString().slice(0,10);
+  document.getElementById('salary').addEventListener('change',e=>{ S.salary=+e.target.value||0; commit(); });
   render();
   if(sheetURL){ document.getElementById('sheetUrl').value=sheetURL; setBadge('caricamento…','pct'); pullRemote(false); }
 })();
