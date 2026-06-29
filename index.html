@@ -400,6 +400,8 @@ function renderKids(e){
   const k=document.getElementById('kids-'+e.id); if(!k) return;
   let rows = `
     <div class="row" style="gap:10px;flex-wrap:wrap;margin-bottom:8px">
+      <label class="f" style="flex-direction:row;align-items:center;gap:6px">Nome
+        <input value="${e.name}" style="width:170px" onchange="setField('${e.id}','name',this.value)"></label>
       <label class="f" style="flex-direction:row;align-items:center;gap:6px">Peso
         <select onchange="setWeight('${e.id}',this.value)">
           <option value="fixed" ${e.weight==='fixed'?'selected':''}>fisso (€/mese)</option>
