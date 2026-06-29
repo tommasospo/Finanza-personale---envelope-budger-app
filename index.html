@@ -191,7 +191,7 @@
         <input id="sheetUrl" placeholder="https://script.google.com/macros/s/.../exec">
       </label>
       <div class="tools" style="margin-top:12px">
-        <button class="primary sm" onclick="connectSheet()">Connetti & invia dati attuali</button>
+        <button class="primary sm" onclick="connectSheet()">Connetti & carica dal Sheet</button>
         <button class="sm" onclick="pullRemote(true)">⬇ Carica dal Sheet</button>
         <button class="sm" onclick="pushRemote(true)">⬆ Salva sul Sheet ora</button>
         <button class="sm ghost danger" onclick="disconnectSheet()">Disconnetti</button>
@@ -591,7 +591,7 @@ async function pullRemote(manual){
 async function connectSheet(){
   const url=document.getElementById('sheetUrl').value.trim();
   if(!/\/exec$/.test(url)){ toast('URL non valido (deve finire con /exec)'); return; }
-  sheetURL=url; localStorage.setItem(SHEET_KEY,url); syncMsg('Connessione e invio dati attuali…'); await pushRemote(true);
+  sheetURL=url; localStorage.setItem(SHEET_KEY,url); syncMsg('Connesso. Carico i dati dal Sheet…'); await pullRemote(true);
 }
 function disconnectSheet(){ sheetURL=''; localStorage.removeItem(SHEET_KEY); setBadge('solo locale',''); syncMsg('Disconnesso. L app salva solo nel browser.'); document.getElementById('sheetUrl').value=''; }
 
