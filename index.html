@@ -63,8 +63,26 @@
   table{width:100%;border-collapse:collapse}
   td,th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:right}
   th:first-child,td:first-child{text-align:left}
-  .tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
-  .tabs button.active{background:var(--accent);color:#06223f;border-color:var(--accent);font-weight:600}
+  .nav{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+  .nav button[data-tab]{background:var(--chip);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 12px;font:inherit;cursor:pointer}
+  .nav button[data-tab].active{background:var(--accent);color:#06223f;border-color:var(--accent);font-weight:600}
+  .navspace{flex:1 1 auto}
+  .burger{display:none;background:transparent;border:0;color:var(--txt);font-size:22px;line-height:1;padding:2px 8px;cursor:pointer}
+  @media(max-width:760px){
+    .burger{display:block}
+    .nav{display:none;flex-direction:column;align-items:stretch;gap:5px}
+    .nav.open{display:flex}
+    .nav button{width:100%;text-align:left}
+    .navspace{display:none}
+    .kids{padding-left:14px}
+    .kids .row{flex-direction:column;align-items:stretch}
+    .kids label.f{flex-direction:column !important;align-items:stretch !important;gap:4px}
+    .kids label.f input,.kids label.f select{width:100% !important}
+    .kid{grid-template-columns:1fr 1fr;gap:6px}
+    .kid .mEq{grid-column:1 / -1;text-align:left}
+    header{padding:12px 14px}
+    .wrap{padding:14px}
+  }
   .hide{display:none}
   .small{font-size:12px}
   .danger{color:var(--bad)}
@@ -75,36 +93,34 @@
 </head>
 <body>
 <header>
+  <button class="burger" onclick="toggleMenu()" aria-label="Menu">☰</button>
   <h1>💰 Budget <span class="mut small">envelope</span></h1>
   <div class="grow"></div>
-  <label class="f" style="flex-direction:row;align-items:center;gap:8px">
-    <span>Stipendio del mese</span>
-    <input id="salary" type="number" step="1" style="width:120px">
-  </label>
   <span id="syncBadge" class="pill" title="Stato sincronizzazione">solo locale</span>
-  <div class="tools">
-    <button class="ghost sm" onclick="exportJSON()">⬇ Export</button>
-    <button class="ghost sm" onclick="document.getElementById('imp').click()">⬆ Import</button>
-    <input id="imp" type="file" accept="application/json" class="hide" onchange="importJSON(this)">
-    <button class="ghost sm danger" onclick="resetAll()">Reset</button>
-  </div>
 </header>
 
 <div class="wrap grid">
-  <div class="tabs">
+  <nav id="nav" class="nav">
     <button data-tab="dash" class="active" onclick="tab('dash')">Allocazione</button>
-    <button data-tab="calc" onclick="tab('calc')">Calcolatore scadenze</button>
+    <button data-tab="calc" onclick="tab('calc')">Calcolatore</button>
     <button data-tab="acc" onclick="tab('acc')">Conti & patrimonio</button>
     <button data-tab="hist" onclick="tab('hist')">Storico</button>
     <button data-tab="sync" onclick="tab('sync')">Sync ☁</button>
     <button data-tab="info" onclick="tab('info')">Come funziona</button>
-  </div>
+    <span class="navspace"></span>
+    <button class="ghost sm" onclick="exportJSON()">⬇ Export</button>
+    <button class="ghost sm" onclick="document.getElementById('imp').click()">⬆ Import</button>
+    <input id="imp" type="file" accept="application/json" class="hide" onchange="importJSON(this)">
+    <button class="ghost sm danger" onclick="resetAll()">Reset</button>
+  </nav>
 
   <!-- DASHBOARD -->
   <section id="t-dash" class="grid cols">
     <div class="grid">
       <div class="card">
         <h2>Allocazione mensile</h2>
+        <label class="f" style="flex-direction:row;align-items:center;gap:8px;margin-bottom:12px;color:var(--txt)">Stipendio del mese
+          <input id="salary" type="number" step="1" style="width:140px"></label>
         <div class="kpi" id="kpi"></div>
         <div class="note" id="reconc"></div>
       </div>
@@ -636,7 +652,8 @@ function calcToKid(o){
 function exportJSON(){ const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='budget-'+new Date().toISOString().slice(0,10)+'.json'; a.click(); }
 function importJSON(inp){ const f=inp.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ S=JSON.parse(r.result); migrate(); commit(); toast('Importato ✓'); }catch(e){ alert('File non valido'); } }; r.readAsText(f); inp.value=''; }
 function resetAll(){ if(confirm('Ripristinare i dati di partenza? Perderai le modifiche non esportate.')){ S=seed(); commit(); toast('Reset eseguito'); } }
-function tab(name){ document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===name)); ['dash','calc','acc','hist','sync','info'].forEach(n=>document.getElementById('t-'+n).classList.toggle('hide',n!==name)); }
+function toggleMenu(){ document.getElementById('nav').classList.toggle('open'); }
+function tab(name){ document.querySelectorAll('.nav button[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===name)); ['dash','calc','acc','hist','sync','info'].forEach(n=>document.getElementById('t-'+n).classList.toggle('hide',n!==name)); document.getElementById('nav').classList.remove('open'); }
 let toastT; function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),1900); }
 
 /* ---- boot ---- */
